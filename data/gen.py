@@ -17,8 +17,20 @@ def WriteLinearFile(X=np.linspace(100, 200, 25), m=1.0, c=0.0, RedStd=0.05, plot
 		plt.show()
 	return filename
 
+def QuadraticData(X=np.linspace(100, 200, 25), a=1.0, b=1.0, c=0.0, RedStd=0.05):
+	Y = (a*X**2 + b*X + c) * np.random.normal(loc=1.0, scale=RedStd, size=len(X))
+	return [X, Y, Y*(RedStd)]
 
+def WriteQuadraticFile(X=np.linspace(100, 200, 25), a=1.0, b=1.0, c=0.0, RedStd=0.05, plot=False):
+	filename = 'Quadratic_a%1.2f_b%1.2f_c%1.2f_sd%1.2f_size%i.txt'%(a, b, c, RedStd, len(X))
+	data = QuadraticData(X, a, b, c, RedStd)
+	np.savetxt(filename, np.transpose(np.array(data)))
+	if plot:
+		plt.errorbar(data[0], data[1], data[2], color='k', ls='', ms=14)
+		plt.show()
+	return filename
 
+#--------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-	WriteLinearFile(plot=True)
+	WriteQuadraticFile(plot=True)
