@@ -4,7 +4,7 @@ function update(svg, data, x, y, xAxis, yAxis){
 
   // alert(x(1.0));
 
-  console.log("draw scatterplot");
+  // console.log("draw scatterplot");
 
   svg.append("g")
       .attr("class", "x axis")
@@ -41,7 +41,7 @@ function update(svg, data, x, y, xAxis, yAxis){
 
   scatter.enter().append("circle")
       .attr("class", "enter")
-      .attr("r", "3.5")
+      .attr("r", "2.5")
       .attr("cx", function(d) { return x(d.x); })
       .attr("cy", function(d) { return y(d.y); })
       .style("fill-opacity", 1e-6)

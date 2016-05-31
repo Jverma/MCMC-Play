@@ -72,12 +72,31 @@ function chi_square(data, params){
 	var chi_sq = 0.0;
 	for (i=0; i<data.length; i++){
 		var y_model = params[0] * data[i].x + params[1];
-		var chi_term = (data[i].y - y_model) / data[i].y_err;
-		chi_sq += chi_sq + Math.pow(chi_term, 2);
+		var chi_term = (data[i].y - y_model) / (1.0 * data[i].y_err);
+		chi_sq = chi_sq + Math.pow(chi_term, 2);
 	}
 	return chi_sq;
 }
 
+
+
+// Metropolis-Hastings algorithm.
+function metropolis_hastings(old_chi2, new_chi2){
+	/*
+
+	*/
+	var chi_ratio = Math.exp(old_chi2 - new_chi2);
+	var random_num = Math.random();
+
+	if (chi_ratio >= random_num){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+
+}
 
 
 // Main MCMC function. Metropolis-Hastings algorithm.
@@ -101,18 +120,21 @@ function main_chain(data, old_params, min_params, max_params, std_params){
 	var new_params = markov_chain(old_params, std_params);
 	var new_chiSq = chi_square(data, new_params) / 2;
 
-	var chi_ratio = Math.exp(new_chiSq - old_chiSq);
+	var chi_ratio = Math.exp(old_chiSq - new_chiSq);
 
 	var random_num = Math.random();
+	var count = 0;
 
 	if (chi_ratio >= random_num){
-		// return {'x': new_params[0], 'y': new_params[1]};
-		if ((min_params[0] <= new_params[0] <= max_params[0]) && (min_params[1] <= new_params[1] <= max_params[1])){
-			return {'x': new_params[0], 'y': new_params[1]};
-		}
-		else{
-			return {'x': old_params[0], 'y': old_params[1]};
-		}
+		return {'x': new_params[0], 'y': new_params[1]};
+		// if ((min_params[0] <= new_params[0] <= max_params[0]) && (min_params[1] <= new_params[1] <= max_params[1])){
+		// 	return {'x': new_params[0], 'y': new_params[1]};
+		// }
+		// else{
+		// 	return {'x': old_params[0], 'y': old_params[1]};
+		// }
+		// count ++;
+		// console.log(count);
 	}
 	else{
 		return {'x': old_params[0], 'y': old_params[1]};

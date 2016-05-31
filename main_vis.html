@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<meta chatset="utf-8">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500|Material+Icons" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="static/css/main_page.css">
+<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+<title>MCMC-Play</title>
+<body>
+	<header class="header">
+		<p class="head-txt">Play with MCMC sampler for a better understanding and interprepation.</p>
+	</header>
+	<div class="parameters">
+		<div class="control ui-data">
+	        <label for="data">Data</label>
+	        <div class="select">
+	          <select id="data">
+	            <option value="linear">Linear</option>
+	            <option value="quadratic">Quadratic</option>
+	          </select>
+	        </div>
+	    </div>
+
+		<div class="control ui-fittingFunction">
+	        <label for="fittingFunction">Fitting Function</label>
+	        <div class="select">
+	          <select id="fittingFunction">
+	            <option value="linear">Linear</option>
+	            <option value="quadratic">Quadratic</option>
+	          </select>
+	        </div>
+	    </div>
+
+	    <div class="control ui-numChains">
+	        <label for="numChains">Number of Chains</label>
+	        <div class="select">
+	          <select id="numChains">
+	            <option value="1">1</option>
+	            <option value="2">2</option>
+	          </select>
+	        </div>
+	    </div>
+
+	    <div class="control ui-convergence">
+	        <label for="convergence">Convergence Criterion</label>
+	        <div class="select">
+	          <select id="convergence">
+	            <option value="brute">Brute Force</option>
+	          </select>
+	        </div>
+	    </div>
+		
+
+		<div class="control ui-stepSize">
+	        <label for="stepSize">Step Size</label>
+	        <div class="select">
+	          <select id="stepSize">
+	            <option value="0">0</option>
+	            <option value="0.001">0.001</option>
+	            <option value="0.003">0.003</option>
+	            <option value="0.01">0.01</option>
+	            <option value="0.03">0.03</option>
+	            <option value="0.1">0.1</option>
+	            <option value="0.3">0.3</option>
+		        <option value="1">1</option>
+	            <option value="3">3</option>
+	            <option value="10">10</option>
+	          </select>
+	        </div>
+	    </div>
+	    <div><p></p></div>
+	    <div class="btn-group" role="group" aria-label="...">
+	    	<button type="button" class="btn btn-primary" id = "submit">Submit</button>
+	    </div>
+	    <div><p></p></div>
+	    <div class="btn-group" role="group" aria-label="...">
+	    	<button type="button" class="btn btn-primary" id = "run">Run</button>
+	    </div>
+
+
+	</div>
+
+	<!-- Import D3.js -->
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+
+	<!-- Import Bootstrap files -->
+	<script type="text/javascript" src="/static/javascript/bootstrap.min.js"></script>
+
+	<!-- Import JavaScript code files. -->
+	<script type="text/javascript" src="./vis/updateScatter.js"></script>
+	<script type="text/javascript" src="./vis/mainScatter.js"></script>
+	<script type="text/javascript" src="vis/LineChart.js"></script>
+	<script type="text/javascript" src="src/mcmc.js"></script>
+
+	<script type="text/javascript">
+	// create a SVG holder for the main scatterplot.
+	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+	var x = d3.scale.linear()
+	    .range([0, width]);
+
+	var y = d3.scale.linear()
+	    .range([height, 0]);
+
+
+	var xAxis = d3.svg.axis()
+	    .scale(x)
+	    .orient("bottom");
+
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .orient("left");
+
+	var svg = d3.select("body").append("svg")
+		.attr("class", "svg")
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+// Right SVG.
+	var xScale = d3.scale.linear()
+		.domain([-3.0, 3.0])
+	    .range([0, width]);
+
+	var yScale = d3.scale.linear()
+		.domain([-1.0, 1.0])
+	    .range([height, 0]);
+
+	var xAxis1 = d3.svg.axis()
+	    .scale(xScale)
+	    .orient("bottom");
+
+	var yAxis1 = d3.svg.axis()
+	    .scale(yScale)
+	    .orient("left");
+
+	var svg1 = d3.select("body").append("svg")
+		.attr("class", "svg1")
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	var main_data;
+	var stepSize;
+
+
+	// On clicking the sumbit button, scatterplot of the data appears.
+	var abc = d3.select('#submit')
+				.on("click", function(){
+					stepSize = parseFloat(document.getElementById('stepSize').value);
+					var data_type = document.getElementById('data');
+
+					if (data_type.value == 'linear'){
+					d3.csv('./vis/Linear_m1.00_c0.00_sd0.05_size25.csv', function(d){
+					  return {
+					    x: +d.x,
+					    y: +d.y,
+					    y_err: +d.y_err
+					  };
+					}, function(dataset){
+						main_data = dataset;
+					  scatterData(dataset, svg, x, y, height, width, xAxis, yAxis);
+					});
+				}
+				else if (data_type.value == 'quadratic'){
+					d3.csv('./data/Quadratic_a1.00_b1.00_c0.00_sd0.05_size25.csv', function(d){
+					  return {
+					    x: +d.x,
+					    y: +d.y,
+					    y_err: +d.y_err
+					  };
+					}, function(dataset){
+						main_data = dataset;
+					  scatterData(dataset, svg, x, y, height, width, xAxis, yAxis);
+					});
+				} else{
+					alert("no file selected.");
+				}
+
+				});
+
+	// On Clicking Run botton the MCMC starts running.
+ 	var xyz = d3.select('#run')
+ 				.on("click", function(){
+ 					// var data = [{'x': 0.1, 'y':0.37}, {'x':0.2, y:0.0}];
+ 					var data = [];
+ 					var old_params = initialize(2, [-1.0,-0.8], [2.5,0.8]);
+ 					old_params = {'x': old_params[0], 'y': old_params[1]}
+ 					console.log(old_params);
+ 					data.push(old_params);
+ 					update(svg1, data, xScale, yScale, xAxis1, yAxis1);
+ 					drawLine(svg, main_data, old_params.x, old_params.y, x, y);
+
+ 					var intervalID = setInterval(function(){
+ 						// new_point = {'x': Math.random(), 'y': Math.random()}
+ 						new_point = main_chain(main_data, old_params, [-1.0,-1.0], [3.0,1.0], [stepSize, stepSize]);
+ 						data.push(new_point);
+ 						var m = new_point.x;
+ 						var c = new_point.y;
+ 						update(svg1, data, xScale, yScale, xAxis1, yAxis1);
+ 						// console.log(main_data);
+ 						drawLine(svg, main_data, m, c, x, y);
+ 						old_params = new_point;
+ 						console.log(old_params);
+ 						stopUpdate();
+ 					}, 200);
+
+
+ 					function stopUpdate(){
+ 						if (data.length == 10000){
+ 							clearInterval(intervalID)
+ 						}
+ 					}
+
+ 				})
+
+
+	
+	</script>
+
+
+
+</body>
+</html>
