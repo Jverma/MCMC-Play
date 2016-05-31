@@ -26,7 +26,7 @@ def WriteQuadraticFile(X=np.linspace(0, 20, 25), a=5.0, b=10.0, c=25.0, RedStd=0
 	filename = 'Quadratic_a%1.2f_b%1.2f_c%1.2f_sd%1.2f_size%i.csv'%(a, b, c, RedStd, len(X))
 	data = QuadraticData(X, a, b, c, RedStd)
 	np.savetxt(filename, np.transpose(np.array(data)), \
-				delimiter=',', header='x, y, y_err', fmt='%1.5f, %1.5f, %1.5f')
+				delimiter=',', header='x,y,y_err', fmt='%1.5f,%1.5f,%1.5f')
 	if plot:
 		plt.errorbar(data[0], data[1], data[2], color='k', ls='', ms=14)
 		plt.show()
