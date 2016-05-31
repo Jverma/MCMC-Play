@@ -4,11 +4,13 @@ from sys import exit
 
 np.random.seed(250192)
 
-def LinearData(X=np.linspace(-10, 10, 25), m=5.0, c=25.0, RedStd=0.1):
-	Y = (m*X + c) * np.random.normal(loc=1.0, scale=RedStd, size=len(X))
-	return [X, Y, Y*(RedStd)]
+def LinearData(X=np.linspace(-10, 10, 25), m=5.0, c=25.0, RedStd=5.0):
+	delta = np.random.uniform(low=-1*RedStd, high=RedStd, size=len(X))
+	# print delta
+	Y = (m*X + c) + delta
+	return [X, Y, delta]
 
-def WriteLinearFile(X=np.linspace(-10, 10, 25), m=5.0, c=25.0, RedStd=0.1, plot=False):
+def WriteLinearFile(X=np.linspace(-10, 10, 25), m=5.0, c=25.0, RedStd=5.0, plot=False):
 	filename = 'Linear_m%1.2f_c%1.2f_sd%1.2f_size%i.csv'%(m, c, RedStd, len(X))
 	data = LinearData(X, m, c, RedStd)
 	np.savetxt(filename, np.transpose(np.array(data)), \
@@ -18,11 +20,13 @@ def WriteLinearFile(X=np.linspace(-10, 10, 25), m=5.0, c=25.0, RedStd=0.1, plot=
 		plt.show()
 	return filename
 
-def QuadraticData(X=np.linspace(-10, 10, 25), a=5.0, b=10.0, c=25.0, RedStd=0.1):
-	Y = (a*X**2 + b*X + c) * np.random.normal(loc=1.0, scale=RedStd, size=len(X))
-	return [X, Y, Y*(RedStd)]
+def QuadraticData(X=np.linspace(-10, 10, 25), a=5.0, b=10.0, c=25.0, RedStd=5.0):
+	delta = np.random.uniform(low=-1*RedStd, high=RedStd, size=len(X))
+	print delta
+	Y = (a*X**2 + b*X + c) + delta
+	return [X, Y, delta]
 
-def WriteQuadraticFile(X=np.linspace(0, 20, 25), a=5.0, b=10.0, c=25.0, RedStd=0.1, plot=False):
+def WriteQuadraticFile(X=np.linspace(0, 20, 25), a=1.0, b=10.0, c=25.0, RedStd=25.0, plot=False):
 	filename = 'Quadratic_a%1.2f_b%1.2f_c%1.2f_sd%1.2f_size%i.csv'%(a, b, c, RedStd, len(X))
 	data = QuadraticData(X, a, b, c, RedStd)
 	np.savetxt(filename, np.transpose(np.array(data)), \
