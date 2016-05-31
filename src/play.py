@@ -14,9 +14,9 @@ __author__ = ("Irshad Mohammed <creativeishu@gmail.com>")
 
 class MCMC(object):
 
-	def __init__(self, NumberOfSteps=100000, FittingFunctionType="Linear", \
-				NumberOfParams=2, Mins=[0.0,-1.0], Maxs=[2.0,1.0], SDs=[0.5,0.5], \
-				datafile="../data/Linear_m1.00_c0.00_sd0.05_size25.txt"):
+	def __init__(self, NumberOfSteps=10000, FittingFunctionType="Linear", \
+				NumberOfParams=2, Mins=[0.0,-1.0], Maxs=[2.0,1.0], SDs=[0.01,0.01], \
+				datafile="../data/Linear_m1.00_c0.00_sd0.05_size25.csv"):
 
 		if not (NumberOfParams == len(Mins) and \
 			NumberOfParams==len(Maxs) and NumberOfParams==len(SDs)):
@@ -32,10 +32,10 @@ class MCMC(object):
 		self.CovMat = diag(self.SD**2)
 		self.FittingFunctionType = FittingFunctionType
 
-		data = genfromtxt(datafile)
+		data = genfromtxt(datafile, delimiter=',', skip_header=1)
 		self.Xdata = data[:,0]
 		self.Ydata = data[:,1]
-		self.Edata = data[:,2]
+		self.Edata = data[:,2]*2.0
 
 #----------------------------------------------------------
 		
@@ -57,7 +57,7 @@ class MCMC(object):
 		else:
 			return True
 
-	def MainChain(self):
+	def MainChain(self, animation=False):
 		OldStep = self.FirstStep()
 		Oldchi2 = self.chisquare(OldStep)
 		outfile = open(self.outputfilename,'w')
@@ -65,11 +65,15 @@ class MCMC(object):
 
 		multiplicity = 0
 		acceptedpoints = 0
+
+		if animation:
+			plt.show()
 		for i in range(self.NumberOfSteps):
 			multiplicity += 1
 			NewStep = self.NextStep(OldStep)
 			Newchi2 = self.chisquare(NewStep)
-
+			print OldStep, NewStep
+			print Oldchi2, Newchi2
 			GoodPoint = self.MetropolisHastings(Oldchi2,Newchi2)
 
 			if not GoodPoint:
@@ -101,8 +105,8 @@ class MCMC(object):
 #==============================================================================
 
 if __name__=="__main__":
-	# obj = MCMC()
-	# obj.MainChain()
+	obj = MCMC()
+	print obj.MainChain()
 	chain = genfromtxt('mcmc.output')
 	pylab.plot(chain[:,2], chain[:,3])
 	pylab.show()
