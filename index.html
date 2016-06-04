@@ -231,7 +231,7 @@
 
  						d3.select(".counter")
  							.append("p")
- 							.html(steps);
+ 							.html("Step: " + steps);
 
  						var old_chi2 = chi_square(main_data, old_params, fit=fitting_fun) / 2;
  						// var new_point = markov_chain(old_params, [stepSize, stepSize])
