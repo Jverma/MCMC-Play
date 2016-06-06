@@ -67,11 +67,19 @@
 	    <div class="control ui-bt">
 	    <div class="btn-group" role="group" aria-label="...">
 	    	<button type="button" class="btn btn-primary" id = "run">Run</button>
+	    	<button type="button" class="btn btn-primary" id = "pause">Pause</button>
 	    </div>
+		</div>
+	    <div class="control ui-bt">
+	    <div class="btn-group" role="group" aria-label="...">
+	    	<button type="button" class="btn btn-primary" id = "refresh">Refresh</button>
+		</div>
+		</div>
+		<div class="control ui-cntr">
 	    <div class="counter"></div>
+		</div>
 	</div>
 
-	<!-- <div class="counter"></div> -->
 
 
 	</div>
@@ -148,6 +156,10 @@
 	var fitting_fun;
 	var data_type;
 	var old_params;
+	var intervalID;
+	var data = [];
+	var paused = false;
+	var steps = 0;
 
 
 
@@ -194,7 +206,19 @@
  					fitting_fun = document.getElementById('fittingFunction').value;
 
  					// alert(old_params[0]);
- 					var data = [];
+ 					// var data = [];
+ 					if (paused){
+ 						if (data_type == 'linear'){
+ 							old_params = [data[data.length - 1].x, data[data.length - 1].y];
+ 						}
+ 						else if (data_type = 'quadratic'){
+ 							old_params = [data[data.length - 1].x, data[data.length - 1].y, data[data.length - 1].z];
+ 						}
+ 						else{
+ 							alert("Wrong data type");
+ 						}
+ 					}
+ 					else{
  					if (data_type == 'linear'){
  						old_params = initialize(2, [-50.0,-50.0], [50.0,50.0]);
  						data.push({'x': old_params[0], 'y': old_params[1]})
@@ -203,17 +227,16 @@
  						old_params = initialize(3,[-5.0, 0.0, -50.0], [5.0, 20.0, 50.0]);
  						data.push({'x': old_params[0], 'y': old_params[1]});
  					}
-
- 					data.push({'x': old_params[0], 'y': old_params[1]})
-
+ 					}
 
 					update(svg1, data, xScale, yScale, xAxis1, yAxis1);
+					// console.log(old_params);
 
  					if (fitting_fun == 'linear'){
- 						drawLine(svg, main_data, old_params.x, old_params.y, x, y);
+ 						drawLine(svg, main_data, old_params[0], old_params[1], x, y);
  					}
  					else if (fitting_fun == 'quadratic'){
- 						drawParabola(svg, main_data, old_params.x, old_params.y, old_params.z, x, y)
+ 						drawParabola(svg, main_data, old_params[0], old_params[1], old_params[2], x, y)
  					}
  					else{
  						alert("Choose a suitable fitting function.");
@@ -221,9 +244,9 @@
  					
  					var acc_points = 0;
  					var cc = 0;
- 					var steps = 0;
+ 					// var steps = 0;
 
- 					var intervalID = setInterval(function(){
+ 					intervalID = setInterval(function(){
  						steps ++;
 
  						d3.select(".counter")
@@ -231,10 +254,9 @@
 
  						d3.select(".counter")
  							.append("p")
- 							.html("Step: " + steps);
+ 							.html("Iteration: " + steps);
 
  						var old_chi2 = chi_square(main_data, old_params, fit=fitting_fun) / 2;
- 						// var new_point = markov_chain(old_params, [stepSize, stepSize])
  						if (data_type == 'linear'){
  							var new_point = markov_chain(old_params, [stepSize, stepSize])
  						}
@@ -278,25 +300,41 @@
 	 					else{
 	 						alert("Choose a suitable fitting function.");
 	 					}
- 						// drawParabola(svg, main_data, m, c, 0.0, x,y);
- 						// old_params = [data_point.x, data_point.y, 25.0];
  						stopUpdate();
- 					}, 0.000001);
+ 					}, 0.0001);
 
 
  					function stopUpdate(){
  						if (data.length == 1000){
- 							console.log('Finished');
- 							// console.log(acc_points);
  							clearInterval(intervalID)
  						}
  					}
 
- 				})
 
+ 				})
+	
+	d3.select("#pause")
+		.on("click", function(){
+			clearInterval(intervalID);
+			paused = true;
+		})
+
+	d3.select("#refresh")
+		.on("click", function(){
+			window.location.reload();
+		})
 
 	
 	</script>
+	<!-- <div class="info">
+		<p class="info-head"><strong>How to play ?</strong></p>
+		<p>Alpha is  a greek alphabet</p>.
+	</div>
+	<div><p></p></div> -->
+	<footer class="footer">
+		<p class="foot-txt">&copy;MarkovianLabs 2016.</p>
+	</footer>
+
 
 
 
